@@ -51,7 +51,7 @@ public class Tateti {
         Move bestMove = null;
         for (Move move : getPossibleMoves(board)) {
             addCell(move, MINIMIZER_CELL);
-            int score = minMax(board, false);
+            int score = minMax(board, true);
             undoCell(move);
             if (score < bestScore) {
                 bestScore = score;
@@ -75,21 +75,15 @@ public class Tateti {
             best = Integer.MIN_VALUE;
             for (Move move : getPossibleMoves(board)) {
                 addCell(move, 1);
-                int score = minMax(board, false);
+                best = Math.max(best, minMax(board, false));
                 undoCell(move);
-                if (score > best) {
-                    best = score;
-                }
             }
         } else {
             best = Integer.MAX_VALUE;
             for (Move move : getPossibleMoves(board)) {
                 addCell(move, 2);
-                int score = minMax(board, true);
+                best = Math.min(best, minMax(board, true));
                 undoCell(move);
-                if (score < best) {
-                    best = score;
-                }
             }
         }
         return best;
@@ -169,65 +163,69 @@ public class Tateti {
     }
 
     private int evaluate() {
-        int score = 0;
-        // Evaluate score for each of the 8 lines (3 rows, 3 columns, 2 diagonals)
-        for (int i = 0; i < 3; i++) {
-            score += evaluateLine(i, 0, i, 1, i, 2);  // row
-            score += evaluateLine(0, i, 1, i, 2, i);  // column
-        }
-        score += evaluateLine(0, 0, 1, 1, 2, 2);  // diagonal
-        score += evaluateLine(0, 2, 1, 1, 2, 0);  // alternate diagonal
-        return score;
+        int winner = getWinner();
+        return winner == 0 ? 0 : winner == MAXIMIZER_CELL ? 10 : -10;
     }
-
-    /*
-     retorna +100, +10, +1 for 3-, 2-, 1-in-a-line for computer.
-     -100, -10, -1 for 3-, 2-, 1-in-a-line for opponent.
-     0 otherwise */
-    private int evaluateLine(int row1, int col1, int row2, int col2, int row3, int col3) {
-        int score;
-        switch (board[row1][col1]) { // First cell
-            case MAXIMIZER_CELL: score = 1; break;
-            case MINIMIZER_CELL: score = -1; break;
-            default: score = 0; break;
-        }
-        // Second cell
-        if (board[row2][col2] == MAXIMIZER_CELL) {
-            if (score == 1) {   // cell1 is MAXIMIZER_CELL
-                score = 10;
-            } else if (score == -1) {  // cell1 is MINIMIZER_CELL
-                return 0;
-            } else {  // cell1 is empty
-                score = 1;
-            }
-        } else if (board[row2][col2] == MINIMIZER_CELL) {
-            if (score == -1) { // cell1 is MINIMIZER_CELL
-                score = -10;
-            } else if (score == 1) { // cell1 is MAXIMIZER_CELL
-                return 0;
-            } else {  // cell1 is empty
-                score = -1;
-            }
-        }
-
-        // Third cell
-        if (board[row3][col3] == MAXIMIZER_CELL) {
-            if (score > 0) {  // cell1 and/or cell2 is mySeed
-                score *= 10;
-            } else if (score < 0) {  // cell1 and/or cell2 is MINIMIZER_CELL
-                return 0;
-            } else {  // cell1 and cell2 are empty
-                score = 1;
-            }
-        } else if (board[row3][col3] == MINIMIZER_CELL) {
-            if (score < 0) {  // cell1 and/or cell2 is MINIMIZER_CELL
-                score *= 10;
-            } else if (score > 0) {  // cell1 and/or cell2 is MAXIMIZER_CELL
-                return 0;
-            } else {  // cell1 and cell2 are empty
-                score = -1;
-            }
-        }
-        return score;
-    }
+//    private int evaluate() {
+//        int score = 0;
+//        // Evaluate score for each of the 8 lines (3 rows, 3 columns, 2 diagonals)
+//        for (int i = 0; i < 3; i++) {
+//            score += evaluateLine(i, 0, i, 1, i, 2);  // row
+//            score += evaluateLine(0, i, 1, i, 2, i);  // column
+//        }
+//        score += evaluateLine(0, 0, 1, 1, 2, 2);  // diagonal
+//        score += evaluateLine(0, 2, 1, 1, 2, 0);  // alternate diagonal
+//        return score;
+//    }
+//
+//    /*
+//     retorna +100, +10, +1 for 3-, 2-, 1-in-a-line for computer.
+//     -100, -10, -1 for 3-, 2-, 1-in-a-line for opponent.
+//     0 otherwise */
+//    private int evaluateLine(int row1, int col1, int row2, int col2, int row3, int col3) {
+//        int score;
+//        switch (board[row1][col1]) { // First cell
+//            case MAXIMIZER_CELL: score = 1; break;
+//            case MINIMIZER_CELL: score = -1; break;
+//            default: score = 0; break;
+//        }
+//        // Second cell
+//        if (board[row2][col2] == MAXIMIZER_CELL) {
+//            if (score == 1) {   // cell1 is MAXIMIZER_CELL
+//                score = 10;
+//            } else if (score == -1) {  // cell1 is MINIMIZER_CELL
+//                return 0;
+//            } else {  // cell1 is empty
+//                score = 1;
+//            }
+//        } else if (board[row2][col2] == MINIMIZER_CELL) {
+//            if (score == -1) { // cell1 is MINIMIZER_CELL
+//                score = -10;
+//            } else if (score == 1) { // cell1 is MAXIMIZER_CELL
+//                return 0;
+//            } else {  // cell1 is empty
+//                score = -1;
+//            }
+//        }
+//
+//        // Third cell
+//        if (board[row3][col3] == MAXIMIZER_CELL) {
+//            if (score > 0) {  // cell1 and/or cell2 is mySeed
+//                score *= 10;
+//            } else if (score < 0) {  // cell1 and/or cell2 is MINIMIZER_CELL
+//                return 0;
+//            } else {  // cell1 and cell2 are empty
+//                score = 1;
+//            }
+//        } else if (board[row3][col3] == MINIMIZER_CELL) {
+//            if (score < 0) {  // cell1 and/or cell2 is MINIMIZER_CELL
+//                score *= 10;
+//            } else if (score > 0) {  // cell1 and/or cell2 is MAXIMIZER_CELL
+//                return 0;
+//            } else {  // cell1 and cell2 are empty
+//                score = -1;
+//            }
+//        }
+//        return score;
+//    }
 }

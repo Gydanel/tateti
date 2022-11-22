@@ -1,9 +1,16 @@
 plugins {
     id("java")
+    id("application")
+}
+
+val javaMainClass = "ar.edu.uade.programacion3.tateti.CmdLineTateti"
+
+application {
+    mainClass.set(javaMainClass)
 }
 
 group = "ar.edu.uade.programacion3.tateti"
-version = "1.0-SNAPSHOT"
+version = "1.0"
 
 repositories {
     mavenCentral()
