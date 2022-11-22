@@ -51,7 +51,7 @@ public class Tateti {
         Move bestMove = null;
         for (Move move : getPossibleMoves(board)) {
             addCell(move, MINIMIZER_CELL);
-            int score = minMax(board, true);
+            int score = minMax(board, true, 0);
             undoCell(move);
             if (score < bestScore) {
                 bestScore = score;
@@ -59,15 +59,15 @@ public class Tateti {
             }
         }
         System.out.println("score " + bestScore);
-        if (bestScore >= 100) {
+        if (bestScore >= 10) {
             System.out.println("found winning move " + bestScore + " " + bestMove);
         }
         return bestMove;
     }
 
-    private int minMax(int[][] board, boolean isMax) {
+    private int minMax(int[][] board, boolean isMax, int depth) {
         if (isBoardFull(board)) return 0;
-        int winner = evaluate();
+        int winner = evaluate(depth);
         if (winner != 0) return winner;
 
         int best;
@@ -75,14 +75,14 @@ public class Tateti {
             best = Integer.MIN_VALUE;
             for (Move move : getPossibleMoves(board)) {
                 addCell(move, 1);
-                best = Math.max(best, minMax(board, false));
+                best = Math.max(best, minMax(board, false, depth + 1));
                 undoCell(move);
             }
         } else {
             best = Integer.MAX_VALUE;
             for (Move move : getPossibleMoves(board)) {
                 addCell(move, 2);
-                best = Math.min(best, minMax(board, true));
+                best = Math.min(best, minMax(board, true, depth + 1));
                 undoCell(move);
             }
         }
@@ -162,9 +162,9 @@ public class Tateti {
         System.out.println();
     }
 
-    private int evaluate() {
+    private int evaluate(int depth) {
         int winner = getWinner();
-        return winner == 0 ? 0 : winner == MAXIMIZER_CELL ? 10 : -10;
+        return winner == 0 ? 0 : winner == MAXIMIZER_CELL ? 10 - depth : depth - 10;
     }
 //    private int evaluate() {
 //        int score = 0;
