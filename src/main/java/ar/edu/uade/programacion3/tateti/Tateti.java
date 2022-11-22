@@ -59,7 +59,7 @@ public class Tateti {
             }
         }
         System.out.println("score " + bestScore);
-        if (bestScore >= 10) {
+        if (bestScore < 0) {
             System.out.println("found winning move " + bestScore + " " + bestMove);
         }
         return bestMove;
