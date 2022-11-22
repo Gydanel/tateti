@@ -58,6 +58,10 @@ public class Tateti {
                 bestMove = move;
             }
         }
+        System.out.println("score " + bestScore);
+        if (bestScore >= 100) {
+            System.out.println("found winning move " + bestScore + " " + bestMove);
+        }
         return bestMove;
     }
 
@@ -218,7 +222,7 @@ public class Tateti {
         } else if (board[row3][col3] == MINIMIZER_CELL) {
             if (score < 0) {  // cell1 and/or cell2 is MINIMIZER_CELL
                 score *= 10;
-            } else if (score > 1) {  // cell1 and/or cell2 is mySeed
+            } else if (score > 0) {  // cell1 and/or cell2 is MAXIMIZER_CELL
                 return 0;
             } else {  // cell1 and cell2 are empty
                 score = -1;

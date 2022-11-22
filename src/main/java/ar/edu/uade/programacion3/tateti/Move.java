@@ -16,4 +16,8 @@ public class Move {
     public int getCol() {
         return col;
     }
+
+    public String toString() {
+        return "row=" + row + ", col=" + col;
+    }
 }
